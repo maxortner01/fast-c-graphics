@@ -19,6 +19,7 @@ typedef struct
     FCG_ContextType type;
     FCG_Handle      handle;
     FCG_Bool        active;
+    FCG_Handle      context;
     FCG_ContextSize size;
 } FCG_Surface;
 

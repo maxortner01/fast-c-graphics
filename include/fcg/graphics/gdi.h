@@ -7,10 +7,9 @@
 
 typedef struct 
 {
-    FCG_Handle handle;
     uint32_t             rendering_device_count;
     FCG_RenderingDevice* rendering_devices;
-    FCG_Bool   active;
+    FCG_Bool             active;
 } FCG_GDI;
 
 FCG_Result 

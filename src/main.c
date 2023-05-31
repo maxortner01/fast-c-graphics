@@ -22,7 +22,9 @@ int main(int argc, char** argv)
         return 1;
     }
     printf("Context size: %u x %u.\n", surface.size.width, surface.size.height);
-    //printf("Graphics Device: %s.\n", machine.graphics_devices->name);
+    printf("Graphics Device: %s.\n", machine.graphics_devices->name);
+    //printf("Graphics queue:  %i.\n", machine.graphics_devices->graphics_queue);
+    //printf("Required Device Extensions (%i): %s.\n", machine.graphics_devices->required_extensions_count, machine.graphics_devices->required_extensions[0]);
 
     FCG_DisplaySurface(&surface);
 

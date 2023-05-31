@@ -1,19 +1,26 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
+#include "../memory/stack.h"
 #include "surface.h"
 #include "../types.h"
 
 typedef struct 
 {
-    const char* name;
+    char* name;
     FCG_Handle  handle;
     FCG_Bool    active;
 } FCG_RenderingDevice;
 
 typedef struct 
 {
-    const char* name;
+    char* name;
+    FCG_Handle handle;
+    I32        present_queue;
+    I32        graphics_queue;
+    FCG_Bool   discrete;
+    U32 required_extensions_count;
+    char** required_extensions;
 } FCG_GraphicsDevice;
 
 typedef struct 
@@ -23,12 +30,13 @@ typedef struct
     uint32_t             graphics_device_count;
     FCG_GraphicsDevice*  graphics_devices;
     FCG_Bool             active;
+    FCG_Memory_Stack     destructor_stack;
 } FCG_Machine;
 
 FCG_Result 
 FCG_InitializeMachine(
     FCG_Machine* FCG_CR machine,
-    const FCG_Surface* FCG_CR surface);
+    FCG_Surface* FCG_CR surface);
 
 FCG_Result 
 FCG_DestroyMachine(

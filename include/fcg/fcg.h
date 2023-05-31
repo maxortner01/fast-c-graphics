@@ -5,4 +5,6 @@
 #include "graphics/device.h"
 #include "graphics/gdi.h"
 
+#include "memory/stack.h"
+
 #endif

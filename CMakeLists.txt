@@ -31,6 +31,7 @@ set(
     ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/device.c
     ${CMAKE_SOURCE_DIR}/src/graphics/gdi.c
     ${CMAKE_SOURCE_DIR}/src/graphics/surface.c
+    ${CMAKE_SOURCE_DIR}/src/memory/stack.c
 )
 
 # If OpenGL is selected, search for it and add it to the list
