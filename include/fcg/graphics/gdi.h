@@ -15,7 +15,7 @@ typedef struct
 FCG_Result 
 FCG_CreateGraphicsInstance(
     FCG_GDI* FCG_CR instance, 
-    const FCG_Machine* FCG_CR machine);
+    FCG_Machine* FCG_CR machine);
 
 FCG_Result 
 FCG_DestroyGraphicsInstance(

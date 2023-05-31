@@ -5,6 +5,10 @@
 #include "surface.h"
 #include "../types.h"
 
+#define DEBUG
+
+typedef void (*FCG_Destructor)(FCG_Memory_Stack* FCG_CR);
+
 typedef struct 
 {
     char* name;
@@ -23,6 +27,12 @@ typedef struct
     char** required_extensions;
 } FCG_GraphicsDevice;
 
+typedef struct
+{
+    FCG_Destructor   handle;
+    FCG_Memory_Stack arguments;
+} FCG_DestructorElement;
+
 typedef struct 
 {
     const char*          name;
@@ -31,6 +41,9 @@ typedef struct
     FCG_GraphicsDevice*  graphics_devices;
     FCG_Bool             active;
     FCG_Memory_Stack     destructor_stack;
+#ifdef DEBUG
+    FCG_Handle           debug;
+#endif
 } FCG_Machine;
 
 FCG_Result 

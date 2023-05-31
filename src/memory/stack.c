@@ -66,6 +66,8 @@ FCG_Memory_Pop(
     FCG_Memory_Stack* FCG_CR stack,
     void* FCG_CR dest)
 {
+    FCG_assert(stack->object_count);
+
     stack->object_count--;
     FCG_Iterator iterator = stack->top;
     iterator -= sizeof(U32);

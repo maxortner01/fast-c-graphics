@@ -5,6 +5,18 @@
 
 #define INITIALIZE(type, name) type name; memset(&name, 0, sizeof(type))
 
+void 
+destroy_rendering_device(
+    FCG_Memory_Stack* FCG_CR stack)
+{
+    FCG_RenderingDevice device;
+    FCG_Memory_Pop(stack, &device);
+
+    FCG_assert(device.active);
+
+    vkDestroyDevice(device.handle, NULL);
+}
+
 VkResult 
 create_logic_device(
     FCG_RenderingDevice* FCG_CR rendering_device,
@@ -99,21 +111,10 @@ create_logic_device(
     return result;
 }
 
-FCG_Result
-destroy_render_device(
-    FCG_RenderingDevice* FCG_CR device)
-{
-    FCG_assert(device->active);
-
-    vkDestroyDevice(device->handle, NULL);
-
-    return FCG_SUCCESS;
-}
-
 FCG_Result 
 FCG_CreateGraphicsInstance(
     FCG_GDI* FCG_CR instance,  
-    const FCG_Machine* FCG_CR machine)
+    FCG_Machine* FCG_CR machine)
 {
     memset(instance, 0, sizeof(FCG_GDI));
     instance->active = FCG_True;
@@ -129,6 +130,17 @@ FCG_CreateGraphicsInstance(
         return FCG_RENDERING_DEVICE_FAILED;
     }
 
+    {
+        FCG_DestructorElement element = {
+            .handle = destroy_rendering_device
+        };
+
+        FCG_Memory_InitializeStack(&element.arguments);
+        FCG_Memory_PushStack(&element.arguments, instance->rendering_devices, sizeof(FCG_RenderingDevice));
+
+        FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
+    }
+
     return FCG_SUCCESS;
 }
 
@@ -138,12 +150,9 @@ FCG_DestroyGraphicsInstance(
 {
     FCG_assert(instance->active);
 
-    for (U32 i = 0; i < instance->rendering_device_count; i++)
-    {
-        FCG_Result result = destroy_render_device(instance->rendering_devices + i);
-        if (result) return result;
-    }
-
+    /* We are good to free the list, copies of the needed handles for  */
+    /* destruction are held inside the argument stacks attached to the */
+    /* relevant destructor function pointers.                          */
     if (instance->rendering_devices) free(instance->rendering_devices);
 
     memset(instance, 0, sizeof(FCG_GDI));
