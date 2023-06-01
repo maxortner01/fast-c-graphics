@@ -16,7 +16,7 @@ FCG_CreateRenderEnvironment(
     result = FCG_InitializeMachine(machine, surface);
     if (result) return result;
 
-    result = FCG_CreateGraphicsInstance(gdi, machine);
+    result = FCG_CreateGraphicsInstance(gdi, surface, machine);
     if (result) return result;
 
     return FCG_SUCCESS;

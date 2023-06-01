@@ -41,7 +41,8 @@ typedef enum
     FCG_CONTEXT_CREATE_FAILED   = 0x04,
     FCG_INSTANCE_CREATE_FAILED  = 0x08,
     FCG_RENDERING_DEVICE_FAILED = 0x10,
-    FCG_DEBUG_ERROR             = 0x20
+    FCG_DEBUG_ERROR             = 0x20,
+    FCG_SWAPCHAIN_ERROR         = 0x40
 } FCG_Result;
 
 #endif

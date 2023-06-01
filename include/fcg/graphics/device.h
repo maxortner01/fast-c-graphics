@@ -12,13 +12,6 @@ typedef void (*FCG_Destructor)(FCG_Memory_Stack* FCG_CR);
 typedef struct 
 {
     char* name;
-    FCG_Handle  handle;
-    FCG_Bool    active;
-} FCG_RenderingDevice;
-
-typedef struct 
-{
-    char* name;
     FCG_Handle handle;
     I32        present_queue;
     I32        graphics_queue;
@@ -26,6 +19,14 @@ typedef struct
     U32 required_extensions_count;
     char** required_extensions;
 } FCG_GraphicsDevice;
+
+typedef struct 
+{
+    char* name;
+    FCG_Handle  handle;
+    FCG_Bool    active;
+    FCG_GraphicsDevice* suitable_device;
+} FCG_RenderingDevice;
 
 typedef struct
 {

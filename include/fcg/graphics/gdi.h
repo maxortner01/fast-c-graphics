@@ -15,6 +15,7 @@ typedef struct
 FCG_Result 
 FCG_CreateGraphicsInstance(
     FCG_GDI* FCG_CR instance, 
+    FCG_Surface* FCG_CR surface,
     FCG_Machine* FCG_CR machine);
 
 FCG_Result 
