@@ -35,14 +35,17 @@
 
 typedef enum
 {
-    FCG_SUCCESS                 = 0x00,
-    FCG_INIT_FAILED             = 0x01,
-    FCG_WINDOW_CREATE_FAILED    = 0x02,
-    FCG_CONTEXT_CREATE_FAILED   = 0x04,
-    FCG_INSTANCE_CREATE_FAILED  = 0x08,
-    FCG_RENDERING_DEVICE_FAILED = 0x10,
-    FCG_DEBUG_ERROR             = 0x20,
-    FCG_SWAPCHAIN_ERROR         = 0x40
+    FCG_SUCCESS                 = 0x000,
+    FCG_INIT_FAILED             = 0x001,
+    FCG_WINDOW_CREATE_FAILED    = 0x002,
+    FCG_CONTEXT_CREATE_FAILED   = 0x004,
+    FCG_INSTANCE_CREATE_FAILED  = 0x008,
+    FCG_RENDERING_DEVICE_FAILED = 0x010,
+    FCG_DEBUG_ERROR             = 0x020,
+    FCG_SWAPCHAIN_ERROR         = 0x040,
+    FCG_IMAGE_VIEW_ERROR        = 0x080,
+    FCG_RENDER_PASS_FAILED      = 0x100,
+    FCG_FRAMEBUFFER_FAILED      = 0x200
 } FCG_Result;
 
 #endif

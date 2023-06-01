@@ -5,7 +5,7 @@
 #include "surface.h"
 #include "device.h"
 
-typedef struct 
+typedef struct FCG_GDI_s
 {
     uint32_t             rendering_device_count;
     FCG_RenderingDevice* rendering_devices;
@@ -21,7 +21,6 @@ FCG_CreateGraphicsInstance(
 FCG_Result 
 FCG_DestroyGraphicsInstance(
     FCG_GDI* FCG_CR instance);
-
 
 FCG_Result 
 FCG_CreateRenderEnvironment(

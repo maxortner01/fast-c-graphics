@@ -9,7 +9,7 @@
 
 typedef void (*FCG_Destructor)(FCG_Memory_Stack* FCG_CR);
 
-typedef struct 
+typedef struct FCG_GraphicsDevice_s
 {
     char* name;
     FCG_Handle handle;
@@ -20,7 +20,7 @@ typedef struct
     char** required_extensions;
 } FCG_GraphicsDevice;
 
-typedef struct 
+typedef struct FCG_RenderingDevice_s
 {
     char* name;
     FCG_Handle  handle;
@@ -28,13 +28,13 @@ typedef struct
     FCG_GraphicsDevice* suitable_device;
 } FCG_RenderingDevice;
 
-typedef struct
+typedef struct FCG_DestructorElement_s
 {
     FCG_Destructor   handle;
     FCG_Memory_Stack arguments;
 } FCG_DestructorElement;
 
-typedef struct 
+typedef struct FCG_Machine_s
 {
     const char*          name;
     FCG_Handle           handle;

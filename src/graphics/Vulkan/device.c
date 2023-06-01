@@ -245,7 +245,7 @@ FCG_Result FCG_InitializeMachine(
 
     /* Create surface */
     VkSurfaceKHR vulkan_surface;
-    FCG_assert(SDL_Vulkan_CreateSurface(surface->handle, machine->handle, &vulkan_surface)); // Implement destructor stack to handle this
+    FCG_assert(SDL_Vulkan_CreateSurface(surface->handle, machine->handle, &vulkan_surface)); 
     surface->context = vulkan_surface;
 
     /* Handle surface destruction */

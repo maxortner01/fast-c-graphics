@@ -40,7 +40,7 @@ FCG_Result create_window(FCG_Surface* FCG_CR surface, FCG_WindowData* FCG_CR dat
 }
 
 
-FCG_Result FCG_CreateSurface(FCG_Surface* FCG_CR surface, FCG_ContextType type, FCG_DataHandle const data)
+FCG_Result FCG_Surface_Create(FCG_Surface* FCG_CR surface, FCG_ContextType type, FCG_DataHandle const data)
 {
     /* If we create a surface, we need to at some point initialize SDL */
     if (!SDL_Initialized) initialize_SDL();
@@ -54,11 +54,15 @@ FCG_Result FCG_CreateSurface(FCG_Surface* FCG_CR surface, FCG_ContextType type, 
     }
 }
 
-FCG_Result FCG_DestroySurface(FCG_Surface* FCG_CR surface)
+FCG_Result FCG_Surface_Destroy(FCG_Surface* FCG_CR surface)
 {
     /* Only active surfaces can be destroyed (to prevent 'double free') */
     FCG_assert(surface->active);
     surface->active = FCG_False;
+
+    // Free the surface image list
+
+    if (surface->surface_image.images) free(surface->surface_image.images);
 
     switch (surface->type)
     {

@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 
     FCG_DestroyGraphicsInstance(&gdi);
     FCG_DestroyMachine(&machine);
-    FCG_DestroySurface(&surface);
+    FCG_Surface_Destroy(&surface);
 
     return 0;
 }

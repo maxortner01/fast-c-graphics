@@ -29,6 +29,7 @@ set(
     ${CMAKE_SOURCE_DIR}/src/main.c
     ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/gdi.c
     ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/device.c
+    ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/surface.c
     ${CMAKE_SOURCE_DIR}/src/graphics/gdi.c
     ${CMAKE_SOURCE_DIR}/src/graphics/surface.c
     ${CMAKE_SOURCE_DIR}/src/memory/stack.c
