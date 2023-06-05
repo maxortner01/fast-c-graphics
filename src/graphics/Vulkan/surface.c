@@ -129,6 +129,8 @@ void
 destroy_swapchain(
     FCG_Memory_Stack* FCG_CR stack)
 {
+    printf("destroying swapchain\n");
+
     FCG_Handle device; FCG_Handle swapchain;
     FCG_Memory_Pop(stack, &device);
     FCG_Memory_Pop(stack, &swapchain);
@@ -139,6 +141,8 @@ destroy_swapchain(
 void destroy_image_views(
     FCG_Memory_Stack* FCG_CR stack)
 {
+    printf("destroying image views\n");
+
     FCG_Handle device;
     FCG_Memory_Pop(stack, &device);
 
@@ -152,8 +156,7 @@ void destroy_image_views(
 
 FCG_Result 
 generate_image_views(
-    const VkImage* FCG_CR images,  
-    FCG_Machine* FCG_CR   machine,
+    const VkImage* FCG_CR images, 
     FCG_Surface* FCG_CR   surface,
     const FCG_GDI* FCG_CR instance)
 {
@@ -203,13 +206,16 @@ generate_image_views(
 
     /* Push the logic device to the top of the stack*/
     FCG_Memory_PushStack(&element.arguments, &instance->rendering_devices->handle, sizeof(FCG_Handle));
-    FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
+    FCG_Memory_PushStack(&surface->destructor_stack, &element, sizeof(FCG_DestructorElement));
+    printf("Pushing image views\n");
 }
 
 void 
 destroy_render_pass(
     FCG_Memory_Stack* FCG_CR stack)
 {
+    printf("destroying render pass\n");
+
     FCG_Handle device; FCG_Handle render_pass;
     FCG_Memory_Pop(stack, &device);
     FCG_Memory_Pop(stack, &render_pass);
@@ -219,8 +225,7 @@ destroy_render_pass(
 
 FCG_Result
 generate_render_pass(    
-    FCG_Surface* FCG_CR surface,  
-    FCG_Machine* FCG_CR machine,
+    FCG_Surface* FCG_CR surface,
     const FCG_GDI* FCG_CR instance)
 {
     VkAttachmentDescription attachment_description = {
@@ -282,7 +287,8 @@ generate_render_pass(
     FCG_Memory_InitializeStack(&element.arguments);
     FCG_Memory_PushStack(&element.arguments, &surface->surface_image.pass_handle,  sizeof(FCG_Handle));
     FCG_Memory_PushStack(&element.arguments, &instance->rendering_devices->handle, sizeof(FCG_Handle));
-    FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
+    FCG_Memory_PushStack(&surface->destructor_stack, &element, sizeof(FCG_DestructorElement));
+    printf("Pushing render pass\n");
 
     return FCG_SUCCESS;
 }
@@ -291,12 +297,14 @@ void
 destroy_framebuffers(
     FCG_Memory_Stack* FCG_CR stack)
 {
+    printf("destroying framebuffers\n");
+
     FCG_Handle device;
     FCG_Memory_Pop(stack, &device);
 
     while (stack->object_count)
     {
-        FCG_Handle framebuffer;
+        FCG_Handle framebuffer = NULL;
         FCG_Memory_Pop(stack, &framebuffer);
         vkDestroyFramebuffer(device, framebuffer, NULL);
     }
@@ -304,8 +312,7 @@ destroy_framebuffers(
 
 FCG_Result
 generate_frame_buffers(    
-    FCG_Surface* FCG_CR surface,  
-    FCG_Machine* FCG_CR machine,
+    FCG_Surface* FCG_CR surface,
     const FCG_GDI* FCG_CR instance)
 {
     FCG_SurfaceImage* image = &surface->surface_image;
@@ -324,7 +331,9 @@ generate_frame_buffers(
             .pAttachments    = &image->images[i].view,
             .width           = surface->size.width,
             .height          = surface->size.height,
-            .layers          = 1
+            .layers          = 1,
+            .flags           = 0,
+            .pNext           = NULL
         };
 
         VkFramebuffer framebuffer;
@@ -335,19 +344,33 @@ generate_frame_buffers(
         FCG_Memory_PushStack(&element.arguments, &image->images[i].frame_buffer, sizeof(FCG_Handle));
     }
 
-    FCG_Memory_PushStack(&element.arguments, instance->rendering_devices->handle, sizeof(FCG_Handle));
-    FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
+    FCG_Memory_PushStack(&element.arguments, &instance->rendering_devices->handle, sizeof(FCG_Handle));
+    FCG_Memory_PushStack(&surface->destructor_stack, &element, sizeof(FCG_DestructorElement));
+    printf("pushing frame buffers\n");
 
     return FCG_SUCCESS;
 }
 
 FCG_Result 
 FCG_Surface_Initialize(
-    FCG_Surface* FCG_CR surface,  
+    FCG_Surface* FCG_CR surface, 
     FCG_Machine* FCG_CR machine,
     const FCG_GDI* FCG_CR instance)
 {
     VkImage* images = NULL;
+
+    /* Handle surface destruction */
+    {
+        FCG_DestructorElement element = {
+            .handle = FCG_Surface_Destroy
+        };
+
+        FCG_Memory_InitializeStack(&element.arguments);
+        FCG_Memory_PushStack(&element.arguments, &surface, sizeof(FCG_Handle));
+
+        FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
+        printf("pushing surface\n");
+    }
 
     /* Move this into its own surface_register function or something */
     switch (surface->type)
@@ -367,7 +390,8 @@ FCG_Surface_Initialize(
             FCG_Memory_PushStack(&element.arguments, &surface->surface_image.handle, sizeof(FCG_Handle));
             FCG_Memory_PushStack(&element.arguments, &instance->rendering_devices->handle, sizeof(FCG_Handle));
 
-            FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
+            FCG_Memory_PushStack(&surface->destructor_stack, &element, sizeof(FCG_DestructorElement));
+            printf("pushing swapchain\n");
         }
 
         /* Generate image views */
@@ -396,16 +420,16 @@ FCG_Surface_Initialize(
 
     FCG_Result result;
     /* Generate render pass */
-    result = generate_render_pass(surface, machine, instance);
-    if (result) { free(images); return result; }
+    FCG_assert(generate_render_pass(surface, instance) == FCG_SUCCESS);
+    //if (result) { free(images); return result; }
 
     /* Generate image views */
-    result = generate_image_views(images, machine, surface, instance);
-    if (result) { free(images); return result; }
+    FCG_assert(generate_image_views(images, surface, instance) == FCG_SUCCESS);
+    //if (result) { free(images); return result; }
 
     /* Generate frame buffers */
-    result = generate_frame_buffers(surface, machine, instance);
-    if (result) { free(images); return result; }
+    FCG_assert(generate_frame_buffers(surface, instance) == FCG_SUCCESS);
+    //if (result) { free(images); return result; }
 
     free(images);
     return FCG_SUCCESS;   

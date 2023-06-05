@@ -55,8 +55,13 @@ FCG_Result FCG_Surface_Create(FCG_Surface* FCG_CR surface, FCG_ContextType type,
     }
 }
 
-FCG_Result FCG_Surface_Destroy(FCG_Surface* FCG_CR surface)
+void 
+FCG_Surface_Destroy(
+    FCG_Memory_Stack* FCG_CR stack)
 {
+    FCG_Surface* surface;
+    FCG_Memory_Pop(stack, &surface);
+
     /* Only active surfaces can be destroyed (to prevent 'double free') */
     FCG_assert(surface->active);
     surface->active = FCG_False;
@@ -79,9 +84,8 @@ FCG_Result FCG_Surface_Destroy(FCG_Surface* FCG_CR surface)
     {
         SDL_DestroyWindow(surface->handle);
         if (SDL_Initialized) SDL_Quit();
-        return FCG_SUCCESS;
+        return;
     }
-    
     default: FCG_assert(FCG_CONTEXT_TYPE_NOT_VALID);
     }
 }

@@ -9,6 +9,8 @@ void
 destroy_rendering_device(
     FCG_Memory_Stack* FCG_CR stack)
 {
+    printf("destroying logic device\n");
+
     FCG_RenderingDevice device;
     FCG_Memory_Pop(stack, &device);
 

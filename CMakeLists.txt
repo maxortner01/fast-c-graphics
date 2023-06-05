@@ -7,7 +7,7 @@ if (NOT DEFINED FCG_RENDER_API)
     set(FCG_RENDER_API "Vulkan")
 endif()
 
-if (NOT DEFINED CMAKE_BUILD_TYP)
+if (NOT DEFINED CMAKE_BUILD_TYPE)
     message("Build type not specified, defaulting to Release.")
     set(CMAKE_BUILD_TYPE "Release")
 endif()
@@ -36,6 +36,11 @@ set(
     ${CMAKE_SOURCE_DIR}/src/memory/stack.c
 )
 
+if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    message("In debug mode.")
+endif()
+add_compile_definitions(FCG_DEBUG)
+
 # If OpenGL is selected, search for it and add it to the list
 if (${FCG_RENDER_API} MATCHES "OpenGL")
     message("OpenGL chosen as render API.")
@@ -57,6 +62,25 @@ elseif(${FCG_RENDER_API} MATCHES "Vulkan")
     list(APPEND FCG_INCLUDE ${Vulkan_INCLUDE_DIR})
 
     message("Including: ${Vulkan_INCLUDE_DIR}")
+
+    # Grab the right type of shaderc depending upon the version
+    if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+        set(SHADERC_LIB shaderc_combinedd)
+    elseif (${CMAKE_BUILD_TYPE} MATCHES "Release")
+        set(SHADERC_LIB shaderc_combined)
+    endif()
+
+    # If there is no debug compiled .a, then just use the release (might yield errors)
+    find_library(SHADERC ${SHADERC_LIB} HINTS ${Vulkan_LIBRARY_DIR})
+    if (${SHADERC} MATCHES "SHADERC-NOTFOUND")
+        find_library(SHADERC shaderc_combined HINTS ${Vulkan_LIBRARY_DIR})
+    endif()
+
+    if (NOT ${SHADERC} MATCHES "SHADERC-NOTFOUND")
+        message("Using shaderc")
+        list(APPEND FCG_LIBRARIES ${SHADERC})
+        add_compile_definitions(USE_SHADERC)
+    endif()
 
     message("Vulkan directory: ${Vulkan_LIBRARIES}")
     add_compile_definitions(FCG_RENDER_API_TYPE=2)

@@ -6,8 +6,6 @@
 #include "surface.h"
 #include "destructor.h"
 
-#define DEBUG
-
 typedef struct FCG_GraphicsDevice_s
 {
     char* name;
@@ -35,7 +33,7 @@ typedef struct FCG_Machine_s
     FCG_GraphicsDevice*  graphics_devices;
     FCG_Bool             active;
     FCG_Memory_Stack     destructor_stack;
-#ifdef DEBUG
+#ifdef FCG_DEBUG
     FCG_Handle           debug;
 #endif
 } FCG_Machine;

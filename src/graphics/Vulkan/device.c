@@ -13,6 +13,8 @@ void
 destroy_instance(
     FCG_Memory_Stack* FCG_CR stack)
 {
+    printf("destroying instance\n");
+
     FCG_Handle handle;
     FCG_Memory_Pop(stack, &handle);
     
@@ -26,6 +28,8 @@ void
 destroy_surface(
     FCG_Memory_Stack* FCG_CR stack)
 {
+    printf("destroying surface\n");
+
     FCG_Handle instance; FCG_Handle surface;
     FCG_Memory_Pop(stack, &instance);
     FCG_Memory_Pop(stack, &surface);
@@ -33,7 +37,7 @@ destroy_surface(
     vkDestroySurfaceKHR(instance, surface, NULL);
 }
 
-#ifdef DEBUG
+#ifdef FCG_DEBUG
 
 VKAPI_ATTR VkBool32 VKAPI_CALL 
 debug_callback(
@@ -95,7 +99,7 @@ create_vulkan_instance(
     U32 extra_indices = 0;
 #endif
 
-#ifdef DEBUG
+#ifdef FCG_DEBUG
     extra_indices += 1;
 #endif
 
@@ -107,7 +111,7 @@ create_vulkan_instance(
     *(extensions + sdl_extension_count + present_index++) = VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME;
 #endif
 
-#ifdef DEBUG
+#ifdef FCG_DEBUG
     *(extensions + sdl_extension_count + present_index++) = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 
     const char* validation_layer = "VK_LAYER_KHRONOS_validation";
@@ -139,7 +143,7 @@ create_vulkan_instance(
         .pNext                   = NULL
     };
 
-#ifdef DEBUG
+#ifdef FCG_DEBUG
     create_info.enabledLayerCount = 1;
     create_info.ppEnabledLayerNames = &validation_layer;
 
@@ -154,7 +158,7 @@ create_vulkan_instance(
     return result;
 }
 
-#ifdef DEBUG
+#ifdef FCG_DEBUG
 
 VkResult
 _CreateDebugUtilsMessengerEXT(
@@ -181,6 +185,8 @@ _DestroyDebugUtilsMessengerEXT(
 void destroy_debug_messenger(
     FCG_Memory_Stack* FCG_CR stack)
 {
+    printf("destroying debug messenger\n");
+
     FCG_Handle instance; FCG_Handle messenger;
     FCG_Memory_Pop(stack, &instance);
     FCG_Memory_Pop(stack, &messenger);
@@ -234,7 +240,7 @@ FCG_Result FCG_InitializeMachine(
         FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
     }
 
-#ifdef DEBUG
+#ifdef FCG_DEBUG
     /* Create debug messenger */
     VkDebugUtilsMessengerEXT messenger;
     result = create_debug_messenger(machine->handle, &messenger);
