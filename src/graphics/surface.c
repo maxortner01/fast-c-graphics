@@ -46,6 +46,7 @@ FCG_Result FCG_Surface_Create(FCG_Surface* FCG_CR surface, FCG_ContextType type,
     if (!SDL_Initialized) initialize_SDL();
 
     surface->active = FCG_True;
+    FCG_Memory_InitializeStack(&surface->destructor_stack);
 
     switch (type)
     {
@@ -61,6 +62,14 @@ FCG_Result FCG_Surface_Destroy(FCG_Surface* FCG_CR surface)
     surface->active = FCG_False;
 
     // Free the surface image list
+    while (surface->destructor_stack.object_count)
+    {
+        FCG_DestructorElement element;
+        FCG_Memory_Pop(&surface->destructor_stack, &element);
+        element.handle(&element.arguments);
+        FCG_Memory_DestroyStack(&element.arguments);
+    }
+    FCG_Memory_DestroyStack(&surface->destructor_stack);
 
     if (surface->surface_image.images) free(surface->surface_image.images);
 

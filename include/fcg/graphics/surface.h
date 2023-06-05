@@ -3,6 +3,8 @@
 
 #include <fcg/types.h>
 
+#include "destructor.h"
+
 typedef struct FCG_GDI_s FCG_GDI;
 typedef struct FCG_Machine_s FCG_Machine;
 
@@ -31,13 +33,13 @@ typedef struct FCG_Image_s
 
 typedef struct FCG_SurfaceImage_s
 {
-    U32             index; // current index (useful?)
+    U32             index;       // current index (useful?)
     U32             image_count;
-    FCG_Handle      handle; // Swapchain
+    FCG_Handle      handle;      // Swapchain
     FCG_Handle      pass_handle; // render pass handle
-    FCG_Image*      images; // contains each of the images
-    U32             format; // format of all the contained images
-    FCG_ContextSize size; // size of all the contained images
+    FCG_Image*      images;      // contains each of the images
+    U32             format;      // format of all the contained images
+    FCG_ContextSize size;        // size of all the contained images
 } FCG_SurfaceImage;
 
 typedef struct FCG_Surface_s
@@ -48,6 +50,7 @@ typedef struct FCG_Surface_s
     FCG_Handle       context;
     FCG_ContextSize  size;
     FCG_SurfaceImage surface_image;
+    FCG_Memory_Stack destructor_stack;
 } FCG_Surface;
 
 typedef struct FCG_WindowData_s

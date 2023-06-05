@@ -1,13 +1,12 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include "../memory/stack.h"
-#include "surface.h"
 #include "../types.h"
 
-#define DEBUG
+#include "surface.h"
+#include "destructor.h"
 
-typedef void (*FCG_Destructor)(FCG_Memory_Stack* FCG_CR);
+#define DEBUG
 
 typedef struct FCG_GraphicsDevice_s
 {
@@ -27,12 +26,6 @@ typedef struct FCG_RenderingDevice_s
     FCG_Bool    active;
     FCG_GraphicsDevice* suitable_device;
 } FCG_RenderingDevice;
-
-typedef struct FCG_DestructorElement_s
-{
-    FCG_Destructor   handle;
-    FCG_Memory_Stack arguments;
-} FCG_DestructorElement;
 
 typedef struct FCG_Machine_s
 {

@@ -33,6 +33,53 @@ destroy_surface(
     vkDestroySurfaceKHR(instance, surface, NULL);
 }
 
+#ifdef DEBUG
+
+VKAPI_ATTR VkBool32 VKAPI_CALL 
+debug_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+    void* pUserData)
+{
+    switch (messageSeverity)
+    {
+    default: break;
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+        printf("Info: %s\n", pCallbackData->pMessage); break;
+    
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+        printf("Warning: %s\n", pCallbackData->pMessage); break;
+    
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+        printf("Error: %s\n", pCallbackData->pMessage); break;
+    }
+
+    return VK_FALSE;
+}
+
+void set_debug_create_info(VkDebugUtilsMessengerCreateInfoEXT* create_info)
+{
+    memset(create_info, 0, sizeof(VkDebugUtilsMessengerCreateInfoEXT));
+    create_info->sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    create_info->pNext = NULL;
+    create_info->flags = 0;
+    create_info->messageSeverity = 0;
+    create_info->messageType = 0;
+    create_info->pfnUserCallback = debug_callback;
+    create_info->pUserData = NULL;
+
+    create_info->messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+    create_info->messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
+    create_info->messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+
+    create_info->messageType |= VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT;
+    create_info->messageType |= VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
+    create_info->messageType |= VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+}
+
+#endif 
+
 VkResult
 create_vulkan_instance(
     VkInstance* instance)
@@ -95,6 +142,10 @@ create_vulkan_instance(
 #ifdef DEBUG
     create_info.enabledLayerCount = 1;
     create_info.ppEnabledLayerNames = &validation_layer;
+
+    VkDebugUtilsMessengerCreateInfoEXT debug_info;
+    set_debug_create_info(&debug_info);
+    create_info.pNext = &debug_info;
 #endif
 
     VkResult result = vkCreateInstance(&create_info, NULL, instance);
@@ -104,29 +155,6 @@ create_vulkan_instance(
 }
 
 #ifdef DEBUG
-
-VKAPI_ATTR VkBool32 VKAPI_CALL 
-debug_callback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-    void* pUserData)
-{
-    switch (messageSeverity)
-    {
-    default: break;
-    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-        printf("Info: %s\n", pCallbackData->pMessage); break;
-    
-    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-        printf("Warning: %s\n", pCallbackData->pMessage); break;
-    
-    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-        printf("Error: %s\n", pCallbackData->pMessage); break;
-    }
-
-    return VK_FALSE;
-}
 
 VkResult
 _CreateDebugUtilsMessengerEXT(
@@ -167,23 +195,8 @@ create_debug_messenger(
 {
     printf("Enabling debug messenger.\n");
 
-    VkDebugUtilsMessengerCreateInfoEXT create_info = {
-        .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-        .pNext = NULL,
-        .flags = 0,
-        .messageSeverity = 0,
-        .messageType = 0,
-        .pfnUserCallback = debug_callback,
-        .pUserData = NULL
-    };
-
-    create_info.messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
-    create_info.messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
-    create_info.messageSeverity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-
-    create_info.messageType |= VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT;
-    create_info.messageType |= VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
-    create_info.messageType |= VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    VkDebugUtilsMessengerCreateInfoEXT create_info;
+    set_debug_create_info(&create_info);
 
     return _CreateDebugUtilsMessengerEXT(instance, &create_info, NULL, messenger);
 }
@@ -328,45 +341,5 @@ FCG_Result FCG_InitializeMachine(
     }
 
     free(devices);
-    return FCG_SUCCESS;
-}
-
-FCG_Result FCG_DestroyGraphicsDevice(FCG_GraphicsDevice* FCG_CR device)
-{
-    free(device->name);
-    
-    for (U32 i = 0; i < device->required_extensions_count; i++)
-        free(device->required_extensions[i]);
-    free(device->required_extensions);
-
-    return FCG_SUCCESS;
-}
-
-FCG_Result FCG_DestroyMachine(FCG_Machine* FCG_CR machine)
-{
-    FCG_assert(machine->active);
-
-    while (machine->destructor_stack.object_count)
-    {
-        FCG_DestructorElement element;
-        FCG_Memory_Pop(&machine->destructor_stack, &element);
-        element.handle(&element.arguments);
-        FCG_Memory_DestroyStack(&element.arguments);
-    }
-
-    /* Free the graphics_device */
-    for (uint32_t i = 0; i < machine->graphics_device_count; i++)
-    {
-        FCG_Result result = FCG_DestroyGraphicsDevice(machine->graphics_devices + i);
-        if (result) return result;
-    }
-
-    if (machine->graphics_devices) free(machine->graphics_devices);
-    memset(machine, 0, sizeof(FCG_Machine));
-
-    vkDestroyInstance(machine->handle, NULL);
-
-    FCG_Memory_DestroyStack(&machine->destructor_stack);
-
     return FCG_SUCCESS;
 }
