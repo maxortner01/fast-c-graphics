@@ -60,7 +60,7 @@ FCG_Surface_Destroy(
     FCG_Memory_Stack* FCG_CR stack)
 {
     FCG_Surface* surface;
-    FCG_Memory_Pop(stack, &surface);
+    FCG_Memory_PopStack(stack, &surface);
 
     /* Only active surfaces can be destroyed (to prevent 'double free') */
     FCG_assert(surface->active);
@@ -70,7 +70,7 @@ FCG_Surface_Destroy(
     while (surface->destructor_stack.object_count)
     {
         FCG_DestructorElement element;
-        FCG_Memory_Pop(&surface->destructor_stack, &element);
+        FCG_Memory_PopStack(&surface->destructor_stack, &element);
         element.handle(&element.arguments);
         FCG_Memory_DestroyStack(&element.arguments);
     }

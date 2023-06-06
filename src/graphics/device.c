@@ -24,7 +24,7 @@ FCG_DestroyMachine(
     while (machine->destructor_stack.object_count)
     {
         FCG_DestructorElement element;
-        FCG_Memory_Pop(&machine->destructor_stack, &element);
+        FCG_Memory_PopStack(&machine->destructor_stack, &element);
         element.handle(&element.arguments);
         FCG_Memory_DestroyStack(&element.arguments);
     }

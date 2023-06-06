@@ -12,7 +12,7 @@ destroy_rendering_device(
     printf("destroying logic device\n");
 
     FCG_RenderingDevice device;
-    FCG_Memory_Pop(stack, &device);
+    FCG_Memory_PopStack(stack, &device);
 
     FCG_assert(device.active);
 

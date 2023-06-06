@@ -26,11 +26,11 @@ FCG_Memory_PushStack(
     CSIZE size);
 
 void*
-FCG_Memory_Top(
+FCG_Memory_StackTop(
     const FCG_Memory_Stack* FCG_CR stack);
 
 void
-FCG_Memory_Pop(
+FCG_Memory_PopStack(
     FCG_Memory_Stack* FCG_CR stack,
     void* FCG_CR dest);
 

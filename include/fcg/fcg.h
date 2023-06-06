@@ -4,7 +4,9 @@
 #include "graphics/surface.h"
 #include "graphics/device.h"
 #include "graphics/gdi.h"
+#include "graphics/pipeline.h"
 
 #include "memory/stack.h"
+#include "memory/queue.h"
 
 #endif

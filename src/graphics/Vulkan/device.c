@@ -16,7 +16,7 @@ destroy_instance(
     printf("destroying instance\n");
 
     FCG_Handle handle;
-    FCG_Memory_Pop(stack, &handle);
+    FCG_Memory_PopStack(stack, &handle);
     
     vkDestroyInstance(handle, NULL);
 }
@@ -31,8 +31,8 @@ destroy_surface(
     printf("destroying surface\n");
 
     FCG_Handle instance; FCG_Handle surface;
-    FCG_Memory_Pop(stack, &instance);
-    FCG_Memory_Pop(stack, &surface);
+    FCG_Memory_PopStack(stack, &instance);
+    FCG_Memory_PopStack(stack, &surface);
 
     vkDestroySurfaceKHR(instance, surface, NULL);
 }
@@ -188,8 +188,8 @@ void destroy_debug_messenger(
     printf("destroying debug messenger\n");
 
     FCG_Handle instance; FCG_Handle messenger;
-    FCG_Memory_Pop(stack, &instance);
-    FCG_Memory_Pop(stack, &messenger);
+    FCG_Memory_PopStack(stack, &instance);
+    FCG_Memory_PopStack(stack, &messenger);
 
     _DestroyDebugUtilsMessengerEXT(instance, messenger, NULL);
 }

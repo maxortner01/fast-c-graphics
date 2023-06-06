@@ -132,8 +132,8 @@ destroy_swapchain(
     printf("destroying swapchain\n");
 
     FCG_Handle device; FCG_Handle swapchain;
-    FCG_Memory_Pop(stack, &device);
-    FCG_Memory_Pop(stack, &swapchain);
+    FCG_Memory_PopStack(stack, &device);
+    FCG_Memory_PopStack(stack, &swapchain);
 
     vkDestroySwapchainKHR(device, swapchain, NULL);
 }
@@ -144,12 +144,12 @@ void destroy_image_views(
     printf("destroying image views\n");
 
     FCG_Handle device;
-    FCG_Memory_Pop(stack, &device);
+    FCG_Memory_PopStack(stack, &device);
 
     while (stack->object_count)
     {
         FCG_Handle view;
-        FCG_Memory_Pop(stack, &view);
+        FCG_Memory_PopStack(stack, &view);
         vkDestroyImageView(device, view, NULL);
     }
 }
@@ -217,8 +217,8 @@ destroy_render_pass(
     printf("destroying render pass\n");
 
     FCG_Handle device; FCG_Handle render_pass;
-    FCG_Memory_Pop(stack, &device);
-    FCG_Memory_Pop(stack, &render_pass);
+    FCG_Memory_PopStack(stack, &device);
+    FCG_Memory_PopStack(stack, &render_pass);
 
     vkDestroyRenderPass(device, render_pass, NULL);
 }
@@ -300,12 +300,12 @@ destroy_framebuffers(
     printf("destroying framebuffers\n");
 
     FCG_Handle device;
-    FCG_Memory_Pop(stack, &device);
+    FCG_Memory_PopStack(stack, &device);
 
     while (stack->object_count)
     {
         FCG_Handle framebuffer = NULL;
-        FCG_Memory_Pop(stack, &framebuffer);
+        FCG_Memory_PopStack(stack, &framebuffer);
         vkDestroyFramebuffer(device, framebuffer, NULL);
     }
 }

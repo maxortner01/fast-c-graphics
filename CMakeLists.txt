@@ -30,10 +30,13 @@ set(
     ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/gdi.c
     ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/device.c
     ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/surface.c
+    ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/pipeline.c
     ${CMAKE_SOURCE_DIR}/src/graphics/gdi.c
     ${CMAKE_SOURCE_DIR}/src/graphics/surface.c
     ${CMAKE_SOURCE_DIR}/src/graphics/device.c
+    ${CMAKE_SOURCE_DIR}/src/graphics/pipeline.c
     ${CMAKE_SOURCE_DIR}/src/memory/stack.c
+    ${CMAKE_SOURCE_DIR}/src/memory/queue.c
 )
 
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
