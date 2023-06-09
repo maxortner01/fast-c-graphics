@@ -72,17 +72,26 @@ FCG_Surface_Create(
 /* exist inside a "global scope", but instead only */
 /* inside the scope of the objects within which it */
 /* was created.                                    */
+FCG_SHARED
 void 
 FCG_Surface_Destroy(
     FCG_Memory_Stack* FCG_CR stack);
 
+FCG_SHARED
 FCG_Result 
 FCG_Surface_Initialize(
     FCG_Surface* FCG_CR surface, 
     FCG_Machine* FCG_CR machine,
     const FCG_GDI* FCG_CR instance);
 
-void FCG_DisplaySurface(const FCG_Surface* FCG_CR surface);
-void FCG_KeepSurfaceOpen(const FCG_Surface* FCG_CR surface);
+FCG_SHARED
+void 
+FCG_DisplaySurface(
+    const FCG_Surface* FCG_CR surface);
+
+FCG_SHARED
+void 
+FCG_KeepSurfaceOpen(
+    const FCG_Surface* FCG_CR surface);
 
 #endif

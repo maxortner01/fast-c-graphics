@@ -11,24 +11,29 @@ typedef struct
     FCG_Handle   data;
 } FCG_Memory_Stack;
 
+FCG_SHARED
 void
 FCG_Memory_InitializeStack(
     FCG_Memory_Stack* FCG_CR stack);
 
+FCG_SHARED
 void 
 FCG_Memory_DestroyStack(
     FCG_Memory_Stack* FCG_CR stack);
 
+FCG_SHARED
 void*
 FCG_Memory_PushStack(
     FCG_Memory_Stack* FCG_CR stack,
     const FCG_Handle const data,
     CSIZE size);
 
+FCG_SHARED
 void*
 FCG_Memory_StackTop(
     const FCG_Memory_Stack* FCG_CR stack);
 
+FCG_SHARED
 void
 FCG_Memory_PopStack(
     FCG_Memory_Stack* FCG_CR stack,

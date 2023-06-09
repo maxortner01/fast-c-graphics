@@ -80,15 +80,18 @@ typedef struct FCG_Module_PipelineInfo_s
  * @param layout The transformation layout
  * @return FCG_Result 
  */
+FCG_SHARED
 FCG_Result
 FCG_Transformation_InitLayout(
     FCG_Transformation_Layout* FCG_CR layout);
 
+FCG_SHARED
 FCG_Result
 FCG_Transformation_DestroyLayout(
     FCG_Transformation_Layout* FCG_CR layout);
 
 /* After all the stages have been added, you can construct the layout */
+FCG_SHARED
 FCG_Result
 FCG_Transformation_ConstructLayout(
     FCG_Transformation_Layout* FCG_CR layout);
@@ -100,6 +103,7 @@ FCG_Transformation_ConstructLayout(
  * @param module Module to push into layout
  * @return FCG_Result 
  */
+FCG_SHARED
 FCG_Result 
 FCG_Transformation_Push(
     FCG_Transformation_Layout* FCG_CR layout,
@@ -112,6 +116,7 @@ FCG_Transformation_Push(
  * @param pipeline_info The creation information
  * @return FCG_Result
  */
+FCG_SHARED
 FCG_Result
 FCG_Module_ConstructPipeline(
     FCG_Module_Transformation* FCG_CR pipeline,

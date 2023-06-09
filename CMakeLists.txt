@@ -13,30 +13,30 @@ if (NOT DEFINED CMAKE_BUILD_TYPE)
 endif()
 
 # Go ahead and compile SDL3
-add_subdirectory(${CMAKE_SOURCE_DIR}/extern/SDL EXCLUDE_FROM_ALL)
+set(SDL_STATIC ON CACHE BOOL "enable sdl static" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/extern/SDL EXCLUDE_FROM_ALL)
 
 # Render API type enums
-add_compile_definitions(FCG_OPENGL=1 FCG_VULKAN=2)
-set(FCG_LIBRARIES SDL3::SDL3)
+add_compile_definitions(FCG_OPENGL=1 FCG_VULKAN=2 FCG_BUILD)
+set(FCG_LIBRARIES SDL3::SDL3-static)
 set(
     FCG_INCLUDE 
-    ${CMAKE_SOURCE_DIR}/include 
-    ${CMAKE_SOURCE_DIR}/extern/SDL/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include 
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/SDL/include
 )
 
 set(
     FCG_SOURCE 
-    ${CMAKE_SOURCE_DIR}/src/main.c
-    ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/gdi.c
-    ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/device.c
-    ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/surface.c
-    ${CMAKE_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/pipeline.c
-    ${CMAKE_SOURCE_DIR}/src/graphics/gdi.c
-    ${CMAKE_SOURCE_DIR}/src/graphics/surface.c
-    ${CMAKE_SOURCE_DIR}/src/graphics/device.c
-    ${CMAKE_SOURCE_DIR}/src/graphics/pipeline.c
-    ${CMAKE_SOURCE_DIR}/src/memory/stack.c
-    ${CMAKE_SOURCE_DIR}/src/memory/queue.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/gdi.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/device.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/surface.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/pipeline.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/gdi.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/surface.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/device.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/pipeline.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/memory/stack.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/memory/queue.c
 )
 
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
@@ -50,8 +50,8 @@ if (${FCG_RENDER_API} MATCHES "OpenGL")
 
     find_package(OpenGL REQUIRED)
     list(APPEND FCG_LIBRARIES ${OPENGL_LIBRARIES})
-    list(APPEND FCG_INCLUDE ${CMAKE_SOURCE_DIR}/extern/glew-2.1.0/include)
-    list(APPEND FCG_SOURCE  ${CMAKE_SOURCE_DIR}/extern/glew-2.1.0/src/glew.c)
+    list(APPEND FCG_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew-2.1.0/include)
+    list(APPEND FCG_SOURCE  ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew-2.1.0/src/glew.c)
 
     message("OpenGl directory: ${OPENGL_LIBRARIES}")
     add_compile_definitions(FCG_RENDER_API_TYPE=1)
@@ -61,6 +61,7 @@ elseif(${FCG_RENDER_API} MATCHES "Vulkan")
     message("Vulkan chosen as render API.")
 
     find_package(Vulkan REQUIRED)
+    message(${Vulkan_LIBRARIES})
     list(APPEND FCG_LIBRARIES ${Vulkan_LIBRARIES})
     list(APPEND FCG_INCLUDE ${Vulkan_INCLUDE_DIR})
 
@@ -95,7 +96,22 @@ include_directories(
 
 add_executable(
     ctest
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.c
     ${FCG_SOURCE}
 )
 
-target_link_libraries(ctest PRIVATE ${FCG_LIBRARIES})
+add_library(
+    ctest_graphics
+    SHARED
+    ${FCG_SOURCE}
+)
+
+add_library(
+    ctest_graphics_static
+    STATIC
+    ${FCG_SOURCE}
+)
+
+target_link_libraries(ctest                 PRIVATE ${FCG_LIBRARIES})
+target_link_libraries(ctest_graphics        PRIVATE ${FCG_LIBRARIES})
+target_link_libraries(ctest_graphics_static PRIVATE ${FCG_LIBRARIES})

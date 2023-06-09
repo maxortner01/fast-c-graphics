@@ -38,11 +38,13 @@ typedef struct FCG_Machine_s
 #endif
 } FCG_Machine;
 
+FCG_SHARED
 FCG_Result 
 FCG_InitializeMachine(
     FCG_Machine* FCG_CR machine,
     FCG_Surface* FCG_CR surface);
 
+FCG_SHARED
 FCG_Result 
 FCG_DestroyMachine(
     FCG_Machine* FCG_CR machine);

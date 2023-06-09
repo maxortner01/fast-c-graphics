@@ -14,6 +14,28 @@
 #   endif
 #endif
 
+#ifdef __cplusplus
+#   ifdef _WIN32
+#       ifdef FCG_BUILD
+#           define FCG_SHARED extern "C" __declspec(dllexport)
+#       else
+#           define FCG_SHARED extern "C" __declspec(dllimport)
+#       endif
+#   else
+#       define FCG_SHARED
+#   endif
+#else
+#   ifdef _WIN32
+#       ifdef FCG_BUILD
+#           define FCG_SHARED __declspec(dllexport)
+#       else
+#           define FCG_SHARED __declspec(dllimport)
+#       endif
+#   else
+#       define FCG_SHARED
+#   endif
+#endif
+
 /* Argument attributes */
 #define FCG_CR const restrict
 

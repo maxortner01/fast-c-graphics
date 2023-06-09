@@ -12,24 +12,29 @@ typedef struct FCG_Memory_Queue_s
     FCG_Handle   data;
 } FCG_Memory_Queue;
 
+FCG_SHARED
 void
 FCG_Memory_InitializeQueue(
     FCG_Memory_Queue* FCG_CR queue);
 
+FCG_SHARED
 void 
 FCG_Memory_DestroyQueue(
     FCG_Memory_Queue* FCG_CR queue);
 
+FCG_SHARED
 void*
 FCG_Memory_PushQueue(
     FCG_Memory_Queue* FCG_CR queue,
     const FCG_Handle const data,
     CSIZE size);
 
+FCG_SHARED
 void*
 FCG_Memory_QueueFront(
     const FCG_Memory_Queue* FCG_CR queue);
 
+FCG_SHARED
 void*
 FCG_Memory_QueueGet(
     FCG_Memory_Queue* FCG_CR queue,

@@ -191,9 +191,9 @@ FCG_Module_ConstructPipeline(
     INIT_STRUCT(VkPipelineViewportStateCreateInfo, viewport_create_info);
     viewport_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewport_create_info.viewportCount = 1;
-    viewport_create_info.pViewports = &_viewport;
+    //viewport_create_info.pViewports = &_viewport;
     viewport_create_info.scissorCount = 1;
-    viewport_create_info.pScissors = &_scissor;
+    //viewport_create_info.pScissors = &_scissor;
 
     INIT_STRUCT(VkPipelineColorBlendStateCreateInfo, blending_create_info);
     blending_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -201,6 +201,7 @@ FCG_Module_ConstructPipeline(
     blending_create_info.attachmentCount = 1;
     blending_create_info.pAttachments = &color_blend_state;
 
+    /*
     VkGraphicsPipelineCreateInfo create_info = {
         .sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
         .pNext               = NULL,
@@ -216,7 +217,7 @@ FCG_Module_ConstructPipeline(
         .renderPass          = pass,
         .subpass             = 0,
         .basePipelineHandle  = VK_NULL_HANDLE
-    };
+    };*/
 	
     free(stage_create_infos);
 
