@@ -1,5 +1,7 @@
 #include <fcg/graphics/pipeline.h>
 
+#include <string.h>
+
 FCG_Result
 FCG_Transformation_InitLayout(
     FCG_Transformation_Layout* FCG_CR layout)
@@ -14,6 +16,13 @@ FCG_Transformation_DestroyLayout(
     FCG_Transformation_Layout* FCG_CR layout)
 {
     FCG_Memory_DestroyQueue(&layout->stages);
+}
+
+FCG_Result
+FCG_Transformation_ConstructLayout(
+    FCG_Transformation_Layout* FCG_CR layout)
+{
+    
 }
 
 FCG_Result 

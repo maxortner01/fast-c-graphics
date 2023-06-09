@@ -4,8 +4,9 @@
 #include "../memory/queue.h"
 #include "../types.h"
 
-typedef struct FCG_Surface_s     FCG_Surface;
-typedef struct FCG_Data_Buffer_s FCG_Data_Buffer;
+typedef struct FCG_RenderingDevice_s FCG_RenderingDevice;
+typedef struct FCG_Surface_s         FCG_Surface;
+typedef struct FCG_Data_Buffer_s     FCG_Data_Buffer;
 
 /**
  * @brief Represents the various types of programmable shaders.
@@ -16,6 +17,13 @@ typedef enum FCG_ShaderType_e
     FCG_SHADER_VERTEX,
     FCG_SHADER_FRAGMENT
 } FCG_ShaderType;
+
+typedef enum FCG_ShaderFileType_s
+{
+    FCG_SHADER_FILE_TYPE_NONE,
+    FCG_SHADER_FILE_TYPE_GLSL,
+    FCG_SHADER_FILE_TYPE_SPRV
+} FCG_ShaderFileType;
 
 /**
  * @brief Types of transformations that can go in a layout.
@@ -50,9 +58,11 @@ typedef struct FCG_Module_Transformation_s
  */
 typedef struct FCG_Module_Programmable_s
 {
-    FCG_Handle     handle;
-    const char*    filename;
-    FCG_ShaderType type;
+    FCG_Handle           handle;
+    const char*          filename;
+    FCG_ShaderType       type;
+    FCG_ShaderFileType   file_type;
+    FCG_RenderingDevice* device;
 } FCG_Module_Programmable;
 
 /**
@@ -76,6 +86,11 @@ FCG_Transformation_InitLayout(
 
 FCG_Result
 FCG_Transformation_DestroyLayout(
+    FCG_Transformation_Layout* FCG_CR layout);
+
+/* After all the stages have been added, you can construct the layout */
+FCG_Result
+FCG_Transformation_ConstructLayout(
     FCG_Transformation_Layout* FCG_CR layout);
 
 /**

@@ -1,5 +1,5 @@
 #include <fcg/fcg.h>
-
+#include "assert.c"
 #include <stdio.h>
 
 int main(int argc, char** argv)
@@ -31,11 +31,17 @@ int main(int argc, char** argv)
     layout.terminal = &surface;
 
     FCG_Module_Programmable shaders[2];
+    shaders[0].handle = NULL;
     shaders[0].type = FCG_SHADER_VERTEX;
-    shaders[0].filename = "vertex.glsl";
+    shaders[0].filename = "../shaders/vert.spv";
+    shaders[0].file_type = FCG_SHADER_FILE_TYPE_SPRV;
+    shaders[0].device = &gdi.rendering_devices[0];
     
+    shaders[1].handle = NULL;
     shaders[1].type = FCG_SHADER_FRAGMENT;
-    shaders[1].filename = "fragment.glsl";
+    shaders[1].filename = "../shaders/frag.spv";
+    shaders[1].file_type = FCG_SHADER_FILE_TYPE_SPRV;
+    shaders[1].device = &gdi.rendering_devices[0];
 
     FCG_Module_Transformation pipeline;
     FCG_Module_PipelineInfo pipeline_info = {
@@ -43,7 +49,7 @@ int main(int argc, char** argv)
         .shaders      = &shaders[0]
     };
 
-    FCG_Module_ConstructPipeline(&pipeline, &pipeline_info, &surface);
+    //FCG_assert(FCG_Module_ConstructPipeline(&pipeline, &pipeline_info, &surface) == FCG_SUCCESS);
     FCG_Transformation_Push(&layout, &pipeline);
 
     FCG_DisplaySurface(&surface);

@@ -2,3 +2,5 @@ build
 bin
 lib
 .vscode/settings.json
+.tours
+shaders
