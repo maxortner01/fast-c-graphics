@@ -12,16 +12,19 @@ typedef struct FCG_GDI_s
     FCG_Bool             active;
 } FCG_GDI;
 
+FCG_SHARED
 FCG_Result 
 FCG_CreateGraphicsInstance(
     FCG_GDI* FCG_CR instance, 
     FCG_Surface* FCG_CR surface,
     FCG_Machine* FCG_CR machine);
 
+FCG_SHARED
 FCG_Result 
 FCG_DestroyGraphicsInstance(
     FCG_GDI* FCG_CR instance);
 
+FCG_SHARED
 FCG_Result 
 FCG_CreateRenderEnvironment(
     FCG_Surface* restrict surface, 

@@ -13,7 +13,7 @@ FCG_CreateRenderEnvironment(
     result = FCG_Surface_Create(surface, type, data);
     if (result) return result;
 
-    result = FCG_InitializeMachine(machine, surface);
+    result = FCG_InitializeMachine(machine);
     if (result) return result;
 
     result = FCG_CreateGraphicsInstance(gdi, surface, machine);

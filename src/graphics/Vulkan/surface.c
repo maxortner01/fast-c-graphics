@@ -3,6 +3,8 @@
 #include <fcg/graphics/device.h>
 #include "../../assert.c"
 
+#include "instance.h"
+
 #include <vulkan/vulkan.h>
 
 VkSurfaceFormatKHR
@@ -138,7 +140,8 @@ destroy_swapchain(
     vkDestroySwapchainKHR(device, swapchain, NULL);
 }
 
-void destroy_image_views(
+void 
+destroy_image_views(
     FCG_Memory_Stack* FCG_CR stack)
 {
     printf("destroying image views\n");
@@ -359,7 +362,25 @@ FCG_Surface_Initialize(
 {
     VkImage* images = NULL;
 
-    /* Handle surface destruction */
+    /* Create the vk surface */
+    VkSurfaceKHR vulkan_surface;
+    FCG_assert(SDL_Vulkan_CreateSurface(surface->handle, machine->handle, &vulkan_surface));
+    surface->context = vulkan_surface; 
+
+    /* Handle vulkan surface destruction */
+    {
+        FCG_DestructorElement element = {
+            .handle    = destroy_surface
+        };
+
+        FCG_Memory_InitializeStack(&element.arguments);
+        FCG_Memory_PushStack(&element.arguments, &surface->context, sizeof(FCG_Handle));
+        FCG_Memory_PushStack(&element.arguments, &machine->handle,  sizeof(FCG_Handle));
+
+        FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
+    }
+
+    /* Handle FCG_surface destruction */
     {
         FCG_DestructorElement element = {
             .handle = FCG_Surface_Destroy

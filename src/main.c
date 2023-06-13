@@ -15,12 +15,13 @@ int main(int argc, char** argv)
     FCG_Surface surface;
     FCG_Machine machine;
     FCG_GDI gdi;
-    FCG_Result result = FCG_CreateRenderEnvironment(&surface, &machine, &gdi, FCG_SURFACE_WINDOW, &data);
-    if (result)
-    {
-        printf("Surface failed to create! Error: %i\n", result);
-        return 1;
-    }
+
+    FCG_assert( 
+        !FCG_InitializeMachine(&machine) &&
+        !FCG_Surface_Create(&surface, FCG_SURFACE_WINDOW, &data) &&
+        !FCG_CreateGraphicsInstance(&gdi, &surface, &machine) 
+    );
+
     printf("Context size: %u x %u.\n", surface.size.width, surface.size.height);
     printf("Graphics Device: %s.\n", machine.graphics_devices->name);
     //printf("Graphics queue:  %i.\n", machine.graphics_devices->graphics_queue);

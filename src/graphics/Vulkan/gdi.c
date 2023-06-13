@@ -123,7 +123,31 @@ FCG_CreateGraphicsInstance(
     memset(instance, 0, sizeof(FCG_GDI));
     instance->active = FCG_True;
 
-    // create rendering device from the physical devices given in the machine
+    /* Figure out the required extensions */
+    for (U32 i = 0; i < machine->graphics_device_count; i++)
+    {
+        FCG_GraphicsDevice* device = machine->graphics_devices + i;
+
+        /* Hopefully the required extensions aren't already set */
+        FCG_assert(!device->required_extensions && !device->required_extensions_count);
+        switch (surface->type)
+        {
+        case FCG_SURFACE_WINDOW:
+        {
+            const char* required_extension = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+            U32 ext_name_length = strlen(required_extension) + 1;
+
+            device->required_extensions_count = 1;
+            device->required_extensions = calloc(device->required_extensions_count, sizeof(void*)); // freed in FCG_DestroyGraphicsDevice
+            device->required_extensions[0] = calloc(ext_name_length, 1); // freed in FCG_DestroyGraphicsDevice
+            memcpy(device->required_extensions[0], &required_extension[0], ext_name_length);
+            break;
+        }
+        default: break;
+        }
+    }
+
+    /* Create rendering device from the physical devices given in the machine */
     // Create logic device
     instance->rendering_device_count = 1;
     instance->rendering_devices = calloc(1, sizeof(FCG_RenderingDevice)); // freed in FCG_DestroyGraphicsInstance
@@ -144,6 +168,8 @@ FCG_CreateGraphicsInstance(
 
         FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
     }
+
+    FCG_Surface_Initialize(surface, machine, instance);
 
     return FCG_SUCCESS;
 }

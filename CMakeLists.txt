@@ -25,12 +25,11 @@ set(
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/SDL/include
 )
 
+file(GLOB RENDER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/*.c")
+
 set(
     FCG_SOURCE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/gdi.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/device.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/surface.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/pipeline.c
+    ${RENDER_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/gdi.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/surface.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/device.c
