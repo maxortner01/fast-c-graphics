@@ -53,13 +53,13 @@ int main(int argc, char** argv)
     FCG_Module_Programmable shaders[2];
     shaders[0].handle = NULL;
     shaders[0].type = FCG_SHADER_VERTEX;
-    shaders[0].filename = "../shaders/vert.spv";
+    shaders[0].filename = "../../../shaders/vert.spv";
     shaders[0].file_type = FCG_SHADER_FILE_TYPE_SPRV;
     shaders[0].device = &gdi.rendering_devices[0];
     
     shaders[1].handle = NULL;
     shaders[1].type = FCG_SHADER_FRAGMENT;
-    shaders[1].filename = "../shaders/frag.spv";
+    shaders[1].filename = "../../../shaders/frag.spv";
     shaders[1].file_type = FCG_SHADER_FILE_TYPE_SPRV;
     shaders[1].device = &gdi.rendering_devices[0];
 
