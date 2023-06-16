@@ -4,3 +4,6 @@
 [submodule "extern/glew"]
 	path = extern/glew
 	url = https://github.com/nigels-com/glew
+[submodule "extern/VMA"]
+	path = extern/VMA
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator

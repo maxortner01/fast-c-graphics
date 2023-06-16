@@ -354,6 +354,39 @@ generate_frame_buffers(
     return FCG_SUCCESS;
 }
 
+FCG_Result
+FCG_Frame_Create(
+    FCG_Frame* FCG_CR frame,
+    const FCG_Surface* FCG_CR surface,
+    FCG_GDI* FCG_CR gdi)
+{
+    VkFenceCreateInfo fence_create_info = {
+        .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+        .pNext = NULL,
+        .flags = VK_FENCE_CREATE_SIGNALED_BIT
+    };
+
+    VkFence render_fence;
+    FCG_assert(vkCreateFence(gdi->rendering_devices->handle, &fence_create_info, NULL, &render_fence) == VK_SUCCESS);
+
+    VkSemaphoreCreateInfo semaphore_create_info = {
+        .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+        .pNext = NULL,
+        .flags = 0
+    };
+
+    VkSemaphore render_semaphore;
+    VkSemaphore present_semaphore;
+    FCG_assert(vkCreateSemaphore(gdi->rendering_devices->handle, &semaphore_create_info, NULL, &render_semaphore) == VK_SUCCESS);
+    FCG_assert(vkCreateSemaphore(gdi->rendering_devices->handle, &semaphore_create_info, NULL, &present_semaphore) == VK_SUCCESS);
+
+    memset(frame, 0, sizeof(FCG_Frame));
+    frame->present_semaphore = present_semaphore;
+    frame->render_semaphore  = render_semaphore;
+    frame->render_fence      = render_fence;
+    frame->surface           = surface;
+}
+
 FCG_Result 
 FCG_Surface_Initialize(
     FCG_Surface* FCG_CR surface, 

@@ -53,11 +53,26 @@ typedef struct FCG_Surface_s
     FCG_Memory_Stack destructor_stack;
 } FCG_Surface;
 
+typedef struct FCG_Frame_s
+{
+    const FCG_Surface* surface;
+    FCG_Image*   current_image;
+    FCG_Handle   present_semaphore;
+    FCG_Handle   render_semaphore;
+    FCG_Handle   render_fence;
+} FCG_Frame;
+
 typedef struct FCG_WindowData_s
 {
     FCG_ContextSize size;
     const char*     title;
 } FCG_WindowData;
+
+FCG_Result
+FCG_Frame_Create(
+    FCG_Frame* FCG_CR frame,
+    const FCG_Surface* FCG_CR surface,
+    FCG_GDI* FCG_CR gdi);
 
 FCG_Result 
 FCG_Surface_Create(

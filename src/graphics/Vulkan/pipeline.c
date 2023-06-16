@@ -1,5 +1,7 @@
 #include <fcg/graphics/pipeline.h>
-#include <fcg/graphics/device.h>
+#include <fcg/graphics/gdi.h>
+#include <fcg/graphics/surface.h>
+#include <fcg/graphics/buffer.h>
 #include <stdio.h>
 #include "../../assert.c"
 
@@ -135,6 +137,7 @@ FCG_Result
 FCG_Module_ConstructPipeline(
     FCG_Module_Transformation* FCG_CR pipeline,
     FCG_Module_PipelineInfo*   FCG_CR pipeline_info,
+    FCG_Data_BufferLayout*     FCG_CR buffers,
     FCG_Surface*               FCG_CR surface)
 {
     VkPipelineShaderStageCreateInfo* stage_create_infos = calloc(
@@ -160,14 +163,90 @@ FCG_Module_ConstructPipeline(
         stage_create_infos[i].pName = "main";
     }
 
-    VkDynamicState dynamic_states[] = { VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT };
+    /* Bindings */
+    U32 total_attributes = 0;
+    VkVertexInputBindingDescription* binding = calloc(buffers->buffers.object_count, sizeof(VkVertexInputBindingDescription));
+    for (U32 i = 0; i < buffers->buffers.object_count; i++)
+    {
+        U32 stride = 0;
+        FCG_Data_Buffer* buffer = FCG_Memory_QueueGet(&buffers->buffers, i);
+        total_attributes += buffer->attribute_count;
+        for (U32 j = 0; j < buffer->attribute_count; j++)
+        {
+            FCG_Data_Attribute* attribute = buffer->attributes + j;
+            stride += attribute->element_size * attribute->element_count;
+        }
 
+        binding[i].binding = i;
+        binding[i].stride  = stride;
+        binding[i].inputRate = 0; // ?
+    }
+
+    /* Attributes */
+    U32 index = 0;
+    VkVertexInputAttributeDescription* attributes = calloc(total_attributes, sizeof(VkVertexInputAttributeDescription));
+    for (U32 i = 0; i < buffers->buffers.object_count; i++)
+    {
+        FCG_Data_Buffer* buffer = FCG_Memory_QueueGet(&buffers->buffers, i);
+
+        U32 offset = 0;
+        for (U32 j = 0; j < buffer->attribute_count; j++)
+        {
+            FCG_Data_Attribute* attribute = buffer->attributes + j;
+            VkFormat format;
+
+            if (attribute->element_size == 4)
+            {
+                switch (attribute->element_count)
+                {
+                case 1: format = VK_FORMAT_R32_SFLOAT; break;
+                case 2: format = VK_FORMAT_R32G32_SFLOAT; break;
+                case 3: format = VK_FORMAT_R32G32B32_SFLOAT; break;
+                case 4: format = VK_FORMAT_R32G32B32A32_SFLOAT; break;
+                default: FCG_assert(FCG_False);
+                }
+            }
+            else FCG_assert(FCG_False);
+
+            attributes[index  ].location = index;
+            attributes[index  ].format   = format;
+            attributes[index  ].binding  = i;
+            attributes[index++].offset   = offset;
+
+            offset += attribute->element_count * attribute->element_size;
+        }
+    }
+
+    /* Take in the attributes of the buffer set */
     INIT_STRUCT(VkPipelineVertexInputStateCreateInfo, input_create_info);
+    input_create_info.vertexBindingDescriptionCount = buffers->buffers.object_count;
+    input_create_info.pVertexBindingDescriptions = binding;
+    input_create_info.vertexAttributeDescriptionCount = total_attributes;
+    input_create_info.pVertexAttributeDescriptions = attributes;
     input_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
     INIT_STRUCT(VkPipelineInputAssemblyStateCreateInfo, input_assembly_create_info);
     input_assembly_create_info.sType    = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     input_assembly_create_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+
+    VkDynamicState dynamic_states[] = { VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT };
+
+    VkViewport viewport = {
+        .x = 0.f,
+        .y = 0.f,
+        .width = surface->size.width,
+        .height = surface->size.height,
+        .maxDepth = 1.f,
+        .minDepth = 0.f
+    };
+
+    VkRect2D scissor = {
+        .extent = {
+            .width = surface->size.width,
+            .height = surface->size.height
+        },
+        .offset = { .x = 0.f, .y = 0.f }
+    };
 
     /* Rastor info (debug info/culling etc.) */
     INIT_STRUCT(VkPipelineRasterizationStateCreateInfo, raster_create_info);
@@ -191,9 +270,9 @@ FCG_Module_ConstructPipeline(
     INIT_STRUCT(VkPipelineViewportStateCreateInfo, viewport_create_info);
     viewport_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewport_create_info.viewportCount = 1;
-    //viewport_create_info.pViewports = &_viewport;
+    viewport_create_info.pViewports = &viewport;
     viewport_create_info.scissorCount = 1;
-    //viewport_create_info.pScissors = &_scissor;
+    viewport_create_info.pScissors = &scissor;
 
     INIT_STRUCT(VkPipelineColorBlendStateCreateInfo, blending_create_info);
     blending_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -201,24 +280,40 @@ FCG_Module_ConstructPipeline(
     blending_create_info.attachmentCount = 1;
     blending_create_info.pAttachments = &color_blend_state;
 
-    /*
+    VkPipelineLayout layout;
+    INIT_STRUCT(VkPipelineLayoutCreateInfo, pipeline_create_info);
+    pipeline_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipeline_create_info.setLayoutCount = 0; // Optional
+    pipeline_create_info.pSetLayouts = NULL; // Optional
+    pipeline_create_info.pushConstantRangeCount = 0; // Optional
+    pipeline_create_info.pPushConstantRanges = NULL; // Optional
+
+    FCG_assert(vkCreatePipelineLayout(pipeline_info->gdi->rendering_devices->handle, &pipeline_create_info, NULL, &layout) == VK_SUCCESS)
+
     VkGraphicsPipelineCreateInfo create_info = {
         .sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
         .pNext               = NULL,
         .stageCount          = pipeline_info->shader_count,
         .pStages             = stage_create_infos,
-        .pVertexInputState   = &_vertexInputInfo,
-        .pInputAssemblyState = &_inputAssembly,
-        .pViewportState      = &viewportState,
-        .pRasterizationState = &_rasterizer,
-        .pMultisampleState   = &_multisampling,
-        .pColorBlendState    = &colorBlending,
-        .layout              = _pipelineLayout,
-        .renderPass          = pass,
+        .pVertexInputState   = &input_create_info,
+        .pInputAssemblyState = &input_assembly_create_info,
+        .pViewportState      = &viewport_create_info,
+        .pRasterizationState = &raster_create_info,
+        .pMultisampleState   = &multisample_create_info,
+        .pColorBlendState    = &blending_create_info,
+        .layout              = layout,
+        .renderPass          = surface->surface_image.pass_handle,
         .subpass             = 0,
         .basePipelineHandle  = VK_NULL_HANDLE
-    };*/
+    };
+
+    VkPipeline vk_pipeline;
+    FCG_assert(vkCreateGraphicsPipelines(pipeline_info->gdi->rendering_devices->handle, NULL, 1, &create_info, NULL, &vk_pipeline) == VK_SUCCESS);
 	
+    pipeline->handle = vk_pipeline;
+
+    free(attributes);
+    free(binding);
     free(stage_create_infos);
 
     return FCG_SUCCESS;

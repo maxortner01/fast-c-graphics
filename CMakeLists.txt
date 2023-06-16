@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(ctest C)
+project(ctest LANGUAGES C CXX)
+
+set (CMAKE_CXX_STANDARD 14)
 
 if (NOT DEFINED FCG_RENDER_API)
     message("Render API not specified, defaulting to OpenGL.")
@@ -26,10 +28,12 @@ set(
 )
 
 file(GLOB RENDER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/*.c")
+file(GLOB RENDER_CPP_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/${FCG_RENDER_API}/*.cpp")
 
 set(
     FCG_SOURCE 
     ${RENDER_SOURCES}
+    ${RENDER_CPP_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/gdi.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/surface.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/device.c
@@ -57,12 +61,20 @@ if (${FCG_RENDER_API} MATCHES "OpenGL")
 
 # Otherwise, do the same for vulkan
 elseif(${FCG_RENDER_API} MATCHES "Vulkan")
+
+    # Since the implementation of VMA is c++, we need to precompile it
+    # Here we would build it
+
     message("Vulkan chosen as render API.")
 
     find_package(Vulkan REQUIRED)
     message(${Vulkan_LIBRARIES})
-    list(APPEND FCG_LIBRARIES ${Vulkan_LIBRARIES})
-    list(APPEND FCG_INCLUDE ${Vulkan_INCLUDE_DIR})
+    list(APPEND FCG_LIBRARIES  
+        ${Vulkan_LIBRARIES})
+    
+    list(APPEND FCG_INCLUDE 
+        ${Vulkan_INCLUDE_DIR} 
+        ${CMAKE_CURRENT_SOURCE_DIR}/extern/VMA/include)
 
     message("Including: ${Vulkan_INCLUDE_DIR}")
 

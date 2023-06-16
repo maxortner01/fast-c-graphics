@@ -4,9 +4,10 @@
 #include "../memory/queue.h"
 #include "../types.h"
 
-typedef struct FCG_RenderingDevice_s FCG_RenderingDevice;
-typedef struct FCG_Surface_s         FCG_Surface;
-typedef struct FCG_Data_Buffer_s     FCG_Data_Buffer;
+typedef struct FCG_RenderingDevice_s   FCG_RenderingDevice;
+typedef struct FCG_Surface_s           FCG_Surface;
+typedef struct FCG_GDI_s               FCG_GDI;
+typedef struct FCG_Data_BufferLayout_s FCG_Data_BufferLayout;
 
 /**
  * @brief Represents the various types of programmable shaders.
@@ -39,9 +40,9 @@ typedef enum FCG_TransformType_s
  */
 typedef struct FCG_Transformation_Layout_s
 {
-    FCG_Data_Buffer* root;
-    FCG_Memory_Queue stages; // < really should change this to block allocation
-    FCG_Surface*     terminal;
+    FCG_Data_BufferLayout* root;
+    FCG_Memory_Queue       stages; // < really should change this to block allocation
+    FCG_Surface*           terminal;
 } FCG_Transformation_Layout;
 
 /**
@@ -51,6 +52,7 @@ typedef struct FCG_Module_Transformation_s
 {
     FCG_Handle        handle;
     FCG_TransformType transform_type;
+    void*             create_info;
 } FCG_Module_Transformation;
 
 /**
@@ -72,6 +74,7 @@ typedef struct FCG_Module_PipelineInfo_s
 {
     uint32_t                 shader_count;
     FCG_Module_Programmable* shaders;
+    FCG_GDI*                 gdi;
 } FCG_Module_PipelineInfo;
 
 /**
@@ -121,6 +124,7 @@ FCG_Result
 FCG_Module_ConstructPipeline(
     FCG_Module_Transformation* FCG_CR pipeline,
     FCG_Module_PipelineInfo*   FCG_CR pipeline_info,
+    FCG_Data_BufferLayout*     FCG_CR buffers,
     FCG_Surface*               FCG_CR surface);
 
 #endif

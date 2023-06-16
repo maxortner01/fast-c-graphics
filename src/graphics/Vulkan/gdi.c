@@ -3,6 +3,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include <vk_mem_alloc.h>
+
 #define INITIALIZE(type, name) type name; memset(&name, 0, sizeof(type))
 
 void 
@@ -114,6 +116,16 @@ create_logic_device(
     return result;
 }
 
+void 
+destroy_allocator(
+    FCG_Memory_Stack* FCG_CR stack)
+{
+    VmaAllocator allocator;
+    FCG_Memory_PopStack(stack, &allocator);
+
+    vmaDestroyAllocator(allocator);
+}
+
 FCG_Result 
 FCG_CreateGraphicsInstance(
     FCG_GDI* FCG_CR instance,  
@@ -167,6 +179,26 @@ FCG_CreateGraphicsInstance(
         FCG_Memory_PushStack(&element.arguments, instance->rendering_devices, sizeof(FCG_RenderingDevice));
 
         FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
+    }
+
+    /* Create allocator in machine */
+    VmaAllocator allocator;
+    INITIALIZE(VmaAllocatorCreateInfo, alloc_create_info);
+    alloc_create_info.physicalDevice = instance->rendering_devices->suitable_device->handle;
+    alloc_create_info.device         = instance->rendering_devices->handle;
+    alloc_create_info.instance       = machine->handle;
+    FCG_assert(vmaCreateAllocator(&alloc_create_info, &allocator) == VK_SUCCESS);
+    machine->allocator = allocator;
+
+    {
+        FCG_DestructorElement element = {
+            .handle = destroy_allocator
+        };
+
+        FCG_Memory_InitializeStack(&element.arguments);
+        FCG_Memory_PushStack(&element.arguments, &allocator, sizeof(allocator));
+
+        FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(element));
     }
 
     FCG_Surface_Initialize(surface, machine, instance);

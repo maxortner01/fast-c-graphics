@@ -41,6 +41,7 @@ FCG_Result FCG_InitializeMachine(
         FCG_Memory_PushStack(&machine->destructor_stack, &element, sizeof(FCG_DestructorElement));
     }
 
+
 #ifdef FCG_DEBUG
     /* Create debug messenger */
     VkDebugUtilsMessengerEXT messenger;
@@ -112,23 +113,6 @@ FCG_Result FCG_InitializeMachine(
             vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, j, vulkan_surface, &present_support);
             if (present_support) device->present_queue = j;
         }
-
-        /* Determine the required extensions 
-        switch (surface->type)
-        {
-        case FCG_SURFACE_WINDOW:
-        {
-            const char* required_extension = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
-            U32 ext_name_length = strlen(required_extension) + 1;
-
-            device->required_extensions_count = 1;
-            device->required_extensions = calloc(device->required_extensions_count, sizeof(void*)); // freed in FCG_DestroyGraphicsDevice
-            device->required_extensions[0] = calloc(ext_name_length, 1); // freed in FCG_DestroyGraphicsDevice
-            memcpy(device->required_extensions[0], &required_extension[0], ext_name_length);
-            break;
-        }
-        default: break;
-        }*/
 
         free(queue_families);
     }

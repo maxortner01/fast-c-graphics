@@ -5,6 +5,7 @@
 #include "graphics/device.h"
 #include "graphics/gdi.h"
 #include "graphics/pipeline.h"
+#include "graphics/buffer.h"
 
 #include "memory/stack.h"
 #include "memory/queue.h"

@@ -29,6 +29,7 @@ typedef struct FCG_Machine_s
 {
     const char*          name;
     FCG_Handle           handle;
+    FCG_Handle           allocator;
     uint32_t             graphics_device_count;
     FCG_GraphicsDevice*  graphics_devices;
     FCG_Bool             active;
