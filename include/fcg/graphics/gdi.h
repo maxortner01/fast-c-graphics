@@ -27,9 +27,9 @@ FCG_DestroyGraphicsInstance(
 FCG_SHARED
 FCG_Result 
 FCG_CreateRenderEnvironment(
-    FCG_Surface* restrict surface, 
-    FCG_Machine* restrict machine, 
-    FCG_GDI* restrict gdi, 
+    FCG_Surface* FCG_R surface, 
+    FCG_Machine* FCG_R machine, 
+    FCG_GDI* FCG_R gdi, 
     FCG_ContextType type, 
     FCG_DataHandle const data);
 

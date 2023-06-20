@@ -99,14 +99,12 @@ FCG_Data_LoadData(
     CU32  block_size,
     U32   attribute_count,
     FCG_Data_Attribute* attributes)
-{
-    FCG_Handle allocator = buffer->owner;
-    
+{   
     /* If the data size has changed, just destroy, this will free the pointers and leave the memory set to 0 */
     if (buffer->allocated != block_size)
     {
-        FCG_assert(FCG_Data_DestroyBuffer(buffer) == FCG_SUCCESS);
-        buffer->owner = allocator;
+        // If there's data, deallocate it
+        if (buffer->data) deallocate_GPU_memory(buffer->owner, buffer->allocation, buffer->buffer);
 
         // allocate the data
         buffer->allocated = block_size;

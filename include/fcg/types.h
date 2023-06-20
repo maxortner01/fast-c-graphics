@@ -1,8 +1,11 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include <stddef.h>
-#include <stdint.h>
+#ifdef __cplusplus
+#else
+#   include <stddef.h>
+#   include <stdint.h>
+#endif
 
 #ifndef FCG_RENDER_API_TYPE
 #   error "Render API type not specified, rebuild and choose OpenGL or Vulkan."
@@ -37,7 +40,13 @@
 #endif
 
 /* Argument attributes */
-#define FCG_CR const restrict
+#ifdef __cplusplus
+#   define FCG_R
+#   define FCG_CR const 
+#else
+#   define FCG_R restrict
+#   define FCG_CR const restrict
+#endif
 
 #define FCG_Bool  uint8_t
 #define FCG_True  1
