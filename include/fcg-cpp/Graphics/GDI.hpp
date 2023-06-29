@@ -8,17 +8,17 @@
 
 namespace fcg
 {
-    template<SurfaceType _Type, typename _Data>
+    template<SurfaceType _Type>
     class GDI : C::FCG_GDI,
         public Utility::NoCopy
     {
     public:
-        GDI(Surface<_Type, _Data>& surface, Machine& machine);
+        GDI(Surface<_Type>& surface, Machine& machine);
         ~GDI();
     };
 
-    template<SurfaceType _Type, typename _Data>
-    GDI<_Type, _Data>::GDI(Surface<_Type, _Data>& surface, Machine& machine)
+    template<SurfaceType _Type>
+    GDI<_Type>::GDI(Surface<_Type>& surface, Machine& machine)
     {
         C::FCG_CreateGraphicsInstance(
             this, 
@@ -27,8 +27,8 @@ namespace fcg
         );
     }
 
-    template<SurfaceType _Type, typename _Data>
-    GDI<_Type, _Data>::~GDI()
+    template<SurfaceType _Type>
+    GDI<_Type>::~GDI()
     {
         C::FCG_DestroyGraphicsInstance(this);
     }
